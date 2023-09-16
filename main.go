@@ -30,13 +30,29 @@ func main() {
 
 	// Start the server
 	slog.Info("Starting the server", "address", address)
-	if err := http.ListenAndServe(address, nil); err != nil {
+	if err := http.ListenAndServe(address, Log(http.DefaultServeMux)); err != nil {
 		slog.Error("Listen and Serve within main", "error", err.Error())
 	}
 }
 
+// Log is a middleware for the http.Handler
+// This wraps the DefaultServeMux (other any other handler) to include structured logging of all requests
+// to the http implementation
+func Log(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("request received",
+			"address", r.RemoteAddr,
+			"method", r.Method,
+			"host", r.Host,
+			"url", r.URL,
+		)
+		handler.ServeHTTP(w, r)
+	})
+}
+
 // LiatrioHandler handles requests to the /liatrio endpoint
 func LiatrioHandler(w http.ResponseWriter, r *http.Request) {
+
 	switch r.Method {
 	case http.MethodGet:
 		GetLiatrio(w, r)
