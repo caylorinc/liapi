@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+      - name: Install Dependencies
+        run: go get .
+      - name: Test with Go
+        run: go test -json ./... > tests.json
+      - name: Upload Go test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: go-test-results
+          path: tests.json
+      - name: Build the binary
+        run: |
+          go build -v \
+            -o build/liapi \
+            -trimpath \
+            -ldflags="-s -w -X main.Version=${GITHUB_REF_NAME} -X main.CommitHash=${GITHUB_SHA} -X main.BuildTime=$(date +%s)"
+      - name: Publish the binary as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/*
+          if-no-files-found: warn
+          retention-days: 60
+    
