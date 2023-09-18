@@ -42,6 +42,7 @@ jobs:
           retention-days: 60
     
   build-and-push-image:
+    needs: build-binary
     permissions:
       contents: read
       packages: write
