@@ -43,8 +43,8 @@ jobs:
     
   build-and-push-image:
     permissions:
-        contents: read
-        packages: write
+      contents: read
+      packages: write
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
@@ -65,10 +65,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         uses: docker/metadata-action@v5
+        id: meta
         with:
           context: workflow
           images: |
-            ${{ REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
