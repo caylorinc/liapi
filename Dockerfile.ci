@@ -1,0 +1,8 @@
+FROM scratch as release
+
+WORKDIR /
+COPY build/liapi /liapi
+
+EXPOSE 8080
+
+ENTRYPOINT ["/liapi"]
