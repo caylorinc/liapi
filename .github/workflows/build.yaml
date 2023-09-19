@@ -29,7 +29,7 @@ jobs:
           path: tests.json
       - name: Build the binary
         run: |
-          go build -v \
+          CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -v -a \
             -o build/liapi \
             -trimpath \
             -ldflags="-s -w -X main.Version=${GITHUB_REF_NAME} -X main.CommitHash=${GITHUB_SHA} -X main.BuildTime=$(date +%s)"

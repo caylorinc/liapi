@@ -1,8 +1,18 @@
-FROM scratch as release
+FROM alpine as builder
 
-WORKDIR /
-COPY build/liapi /liapi
+RUN addgroup -S liapi && adduser -S liapi -G liapi
+COPY --chown=liapi:liapi --chmod=700 build/liapi /liapi
+
+RUN chmod +x /liapi
+
+FROM scratch
+
+COPY --from=builder /etc/passwd /etc/passwd
+USER liapi
+COPY --from=builder /liapi /liapi
 
 EXPOSE 8080
+
+CMD [""]
 
 ENTRYPOINT ["/liapi"]
