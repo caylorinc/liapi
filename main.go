@@ -21,6 +21,7 @@ func main() {
 
 	// Define our routes
 	http.HandleFunc("/liatrio", LiatrioHandler)
+	http.HandleFunc("/ping", PingHandler)
 
 	// Look for bind address in environment
 	address, ok := os.LookupEnv("LIAPI_ADDRESS")
@@ -58,6 +59,29 @@ func LiatrioHandler(w http.ResponseWriter, r *http.Request) {
 		GetLiatrio(w, r)
 	case http.MethodPost:
 		PostLiatrio(w, r)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+// GetPing returns the current health status and version of the application
+func GetPing(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(PingResponse{Version, CommitHash, BuildTime})
+}
+
+// PingResponse struct for representing a response to the Ping endpoint
+type PingResponse struct {
+	Version    string `json:"version"`
+	CommitHash string `json:"commitHash"`
+	BuildTime  string `json:"buildTime"`
+}
+
+// PingHandler handles requests to the /liatrio endpoint
+func PingHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		GetPing(w, r)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}

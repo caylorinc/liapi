@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strconv"
 	"testing"
 	"time"
@@ -69,6 +70,35 @@ func TestPostLiatrio(t *testing.T) {
 	}
 
 	if !isEqual(expected, actual) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			actual, expected)
+	}
+}
+
+func TestGetPing(t *testing.T) {
+	req, err := http.NewRequest("GET", "/ping", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(GetPing)
+
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	expected := PingResponse{Version, CommitHash, BuildTime}
+	var actual PingResponse
+	err = json.NewDecoder(rr.Body).Decode(&actual)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			actual, expected)
 	}
