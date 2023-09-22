@@ -91,7 +91,7 @@ func TestGetPing(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected := PingResponse{Version, CommitHash, BuildTime}
+	expected := PingResponse{"liapi", Version, CommitHash, BuildTime}
 	var actual PingResponse
 	err = json.NewDecoder(rr.Body).Decode(&actual)
 	if err != nil {

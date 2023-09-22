@@ -67,11 +67,12 @@ func LiatrioHandler(w http.ResponseWriter, r *http.Request) {
 // GetPing returns the current health status and version of the application
 func GetPing(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(PingResponse{Version, CommitHash, BuildTime})
+	json.NewEncoder(w).Encode(PingResponse{"liapi", Version, CommitHash, BuildTime})
 }
 
 // PingResponse struct for representing a response to the Ping endpoint
 type PingResponse struct {
+	App        string `json:"app"`
 	Version    string `json:"version"`
 	CommitHash string `json:"commitHash"`
 	BuildTime  string `json:"buildTime"`
