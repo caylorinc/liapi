@@ -13,11 +13,20 @@ var (
 	Version    string = "development"
 	CommitHash string = "unknown"
 	BuildTime  string = "unknown"
+	Hostname   string = "unknown"
 )
 
 func main() {
-
 	slog.Info("liapi", "version", Version, "commit", CommitHash, "buildTime", BuildTime)
+
+	// Get the hostname
+	var err error
+	Hostname, err = os.Hostname()
+	if err != nil {
+		slog.Warn("Unable to get hostname", "error", err.Error())
+		Hostname = "unknown"
+	}
+	slog.Info("Hostname", "hostname", Hostname)
 
 	// Define our routes
 	http.HandleFunc("/liatrio", LiatrioHandler)
@@ -67,7 +76,7 @@ func LiatrioHandler(w http.ResponseWriter, r *http.Request) {
 // GetPing returns the current health status and version of the application
 func GetPing(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(PingResponse{"liapi", Version, CommitHash, BuildTime})
+	json.NewEncoder(w).Encode(PingResponse{"liapi", Version, CommitHash, BuildTime, Hostname})
 }
 
 // PingResponse struct for representing a response to the Ping endpoint
@@ -76,6 +85,7 @@ type PingResponse struct {
 	Version    string `json:"version"`
 	CommitHash string `json:"commitHash"`
 	BuildTime  string `json:"buildTime"`
+	Hostname   string `json:"hostname"`
 }
 
 // PingHandler handles requests to the /liatrio endpoint
